@@ -11,6 +11,7 @@ const timerElement = document.getElementById("timer");
 
 let time, timerON;
 
+// transforma los segundos en un formato mas legible (ej. 06:59)
 function parseSeconds(seconds) {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
@@ -37,14 +38,29 @@ restOpts.forEach((opt) => {
 time = 0;
 const myTimer = new SafeInterval(() => {
   timerElement.textContent = parseSeconds(time--);
+  sessionStorage.setItem("TIMER", time);
   if (time == 0) {
     timerInitButton.textContent = "INICIAR";
     timerON = false;
     console.log("FINISHED TIMER");
     timerElement.dispatchEvent(FINISHED_TIME_EVENT);
+    // solo manda la notificacion si el usuario dejo terminar el contador
+    const noti = new Notification("Tu descanso ha terminado.");
     myTimer.stop();
   }
 }, 1000);
+
+// recupera el contador si es que se reincio la pagina
+document.addEventListener("DOMContentLoaded", () => {
+  if (sessionStorage.getItem("TIMER") && sessionStorage.getItem("TIMER") != 0) {
+    timerON = true;
+    timerInitButton.textContent = "DETENER";
+    time = sessionStorage.getItem("TIMER");
+    myTimer.start();
+  }
+});
+
+// sessionStorage.clear()
 
 timerON = false;
 document.getElementById("rest-form").addEventListener("submit", (e) => {
@@ -56,6 +72,8 @@ document.getElementById("rest-form").addEventListener("submit", (e) => {
     timerElement.dispatchEvent(FINISHED_TIME_EVENT);
     timerInitButton.textContent = "INICIAR";
     timerON = false;
+    time = 0;
+    sessionStorage.setItem("TIMER", time);
     return;
   }
 
@@ -74,7 +92,7 @@ document.getElementById("rest-form").addEventListener("submit", (e) => {
   }
   if (selectedTime == "custom") {
     const customTime = parseInt(customTimeInput.value);
-    if (isNaN(customTime) || customTime < 0 || customTime > 3600) {
+    if (isNaN(customTime) || customTime < 1 || customTime > 3600) {
       errorMessage.textContent =
         "Ingresa un tiempo mayor a cero y menor a una hora.";
       console.log("custom time is invalid");
@@ -83,12 +101,39 @@ document.getElementById("rest-form").addEventListener("submit", (e) => {
     selectedTime = customTime;
   }
 
-  timerON = true;
-  timerInitButton.textContent = "DETENER";
+  document.querySelector(".modal").style.display = "block";
 
-  time = parseInt(selectedTime);
+  const startTimer = () => {
+    timerON = true;
+    timerInitButton.textContent = "DETENER";
 
-  myTimer.start();
+    time = parseInt(selectedTime);
+    myTimer.start();
 
-  console.log("STARTED TIMER");
+    console.log("STARTED TIMER");
+  };
+
+  // El navegador del usuario no puede mandar notificaciones (medio raro)
+  if (!("Notification" in window)) {
+    console.warn("El navegador no puede mandar notificaciones");
+  } else if (Notification.permission == "granted") {
+    // El usuario ya permitio las notificaciones antes
+    document.querySelector(".modal").style.display = "none";
+    startTimer();
+  } else {
+    // Se le pide el permiso de mandar notificaciones al usuario
+    Notification.requestPermission()
+      .then((result) => {
+        if (result == "denied") {
+          // Pone un mensaje que sugiera al usuario activar las notificaciones
+          setTimeout(
+            () => (document.querySelector(".modal").style.display = "none"),
+            5000
+          );
+        } else if (result == "granted") {
+          document.querySelector(".modal").style.display = "none";
+        }
+      })
+      .finally(startTimer);
+  }
 });
