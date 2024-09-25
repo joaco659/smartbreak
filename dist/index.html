@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartBreak</title>
+    <script type="module" crossorigin src="/assets/index-CnFxxUUu.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CJIubhiq.css">
+  </head>
+  <body>
+    <div id="app">
+      <b>SmartBreak</b>
+      <h1>Mide tus descansos entre series en el gimnasio con precisión</h1>
+      <h2>Inicia un descanso</h2>
+      <form id="rest-form">
+        <label>
+          <input type="radio" name="rest-opt" data-time-in-seconds="30" /> 30s
+        </label>
+        <label>
+          <input type="radio" name="rest-opt" data-time-in-seconds="60" /> 1min
+        </label>
+        <label>
+          <input type="radio" name="rest-opt" data-time-in-seconds="90" />
+          1:30min
+        </label>
+        <label>
+          <input type="radio" name="rest-opt" data-time-in-seconds="120" /> 2min
+        </label>
+        <label>
+          <input type="radio" name="rest-opt" data-time-in-seconds="150" />
+          2:30min
+        </label>
+        <label>
+          <input type="radio" name="rest-opt" data-time-in-seconds="180" /> 3min
+        </label>
+        <label>
+          <input
+            type="radio"
+            class="custom-time-opt"
+            name="rest-opt"
+            data-time-in-seconds="custom"
+          />
+          Personalizado
+        </label>
+        <button type="submit" class="timer-init-button">INICIAR</button>
+      </form>
+      <span id="error-message"></span>
+      <div class="custom-time-container" style="display: none">
+        <label for="custom-time"
+          >Ingresa tu tiempo a descansar (en segundos)</label
+        >
+        <input type="number" id="custom-time" min="1" max="3600" />
+      </div>
+      <div class="timer-container">
+        <b id="timer"> 00:00 </b>
+      </div>
+
+      <!-- modal sacado de un proyecto anterior -->
+      <div class="modal" style="display: none;">
+        <!-- Contenido -->
+        <section class="modal__content">
+          <article class="modal__inner-content">
+            <p class="modal__paragraph">
+              Se recomienda activar las notificaciones para saber el fin de tu descanso.
+            </p>
+          </article>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>
